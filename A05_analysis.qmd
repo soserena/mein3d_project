@@ -1,0 +1,313 @@
+---
+title: "Website Behavior & Booking Funnel Analysis"
+subtitle: "MEin3D | Google Analytics 4 | Jan 1 – Apr 21, 2026"
+author: "Kathleen Juarez"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    theme: cosmo
+    embed-resources: true
+    code-fold: true
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(tidyverse)
+library(scales)
+library(knitr)
+library(kableExtra)
+```
+
+## Data Loading
+
+```{r}
+#| label: load-data
+
+# Sessions by channel (from Traffic Acquisition report)
+sessions_raw <- read_csv("A05_data_sessions.csv", skip = 9, show_col_types = FALSE) |>
+  rename(channel = 1, sessions = 2, total_users = 3) |>
+  filter(!is.na(channel), channel != "")
+
+# All events by channel (from Events report)
+events_raw <- read_csv("A05_data_ga4-events.csv", skip = 9, show_col_types = FALSE) |>
+  rename(event_name = 1, channel = 2, event_count = 3, total_users = 4) |>
+  filter(!is.na(event_name), event_name != "")
+```
+
+## Data Preparation
+
+```{r}
+#| label: extract-events
+
+# Helper: extract one event's Total users by channel
+extract_event <- function(event_nm, col_name) {
+  events_raw |>
+    filter(event_name == event_nm) |>
+    select(channel, {{ col_name }} := total_users)
+}
+
+# Funnel stages (using Total users, not event count)
+page_view        <- extract_event("page_view",        page_views)
+form_start       <- extract_event("form_start",       form_starts)
+booking_complete <- extract_event("booking_complete", bookings)
+
+# High-intent behavioral signals (context only — not sequential funnel gates,
+# because form_start users exceed contact/appt users, indicating the form
+# is accessible via multiple paths on the site)
+schedule_appt <- extract_event("Schedule_Appointment", sched_appt_users)
+contact_us    <- extract_event("contact_us",           contact_us_users)
+```
+
+```{r}
+#| label: build-table
+
+ga4_data <- sessions_raw |>
+  select(channel, sessions) |>
+  left_join(page_view,        by = "channel") |>
+  left_join(form_start,       by = "channel") |>
+  left_join(booking_complete, by = "channel") |>
+  left_join(schedule_appt,    by = "channel") |>
+  left_join(contact_us,       by = "channel") |>
+  mutate(across(-channel, ~replace_na(., 0))) |>
+  mutate(
+    page_view_rate    = if_else(sessions > 0,    page_views  / sessions,   0),
+    form_start_rate   = if_else(page_views > 0,  form_starts / page_views, 0),
+    booking_rate      = if_else(form_starts > 0, bookings    / form_starts, 0),
+    overall_conv_rate = if_else(sessions > 0,    bookings    / sessions,   0)
+  )
+
+totals <- ga4_data |>
+  summarise(
+    channel           = "TOTAL",
+    sessions          = sum(sessions),
+    page_views        = sum(page_views),
+    form_starts       = sum(form_starts),
+    bookings          = sum(bookings),
+    sched_appt_users  = sum(sched_appt_users),
+    contact_us_users  = sum(contact_us_users),
+    overall_conv_rate = sum(bookings) / sum(sessions)
+  )
+
+site_avg <- totals$overall_conv_rate
+```
+
+## Statistical Summary
+
+```{r}
+#| label: summary-stats
+#| echo: false
+
+summary_df <- tibble(
+  Metric = c(
+    "Total Sessions",
+    "Page View Users",
+    "Form Start Users",
+    "Bookings Completed",
+    "Page View Rate (users)",
+    "Form Start Rate (of page views)",
+    "Booking Rate (of form starts)",
+    "Overall Conversion Rate",
+    "Largest Drop-off Stage"
+  ),
+  Value = c(
+    comma(totals$sessions),
+    comma(totals$page_views),
+    comma(totals$form_starts),
+    comma(totals$bookings),
+    percent(totals$page_views  / totals$sessions,   accuracy = 0.1),
+    percent(totals$form_starts / totals$page_views, accuracy = 0.1),
+    percent(totals$bookings    / totals$form_starts, accuracy = 0.1),
+    percent(site_avg,                               accuracy = 0.1),
+    paste0("page_view → form_start (",
+           percent(1 - totals$form_starts / totals$page_views, accuracy = 0.1),
+           " drop-off)")
+  )
+)
+
+summary_df |>
+  kbl(align = c("l", "r"), col.names = c("Metric", "Value")) |>
+  kable_styling(
+    bootstrap_options = c("striped", "condensed", "bordered"),
+    full_width = FALSE,
+    font_size = 13
+  ) |>
+  row_spec(0, bold = TRUE, background = "#1A3A5C", color = "white") |>
+  row_spec(9, bold = TRUE)
+```
+# Key Findings - The Core Problem
+
+## Visual Evidence
+
+### Funnel: Most Users Exit Before Starting the Booking Form
+
+```{r}
+#| label: fig-funnel
+#| fig-width: 7
+#| fig-height: 4
+#| fig-cap: "Unique users at each stage of the booking funnel. Red bar indicates the largest drop-off point."
+
+funnel_long <- tibble(
+  stage = factor(
+    c("Sessions", "Page Views", "Form Start", "Booking\nComplete"),
+    levels = c("Sessions", "Page Views", "Form Start", "Booking\nComplete")
+  ),
+  count     = c(totals$sessions, totals$page_views, totals$form_starts, totals$bookings),
+  highlight = c(FALSE, FALSE, TRUE, FALSE)
+)
+
+ggplot(funnel_long, aes(x = stage, y = count, fill = highlight)) +
+  geom_col(width = 0.52) +
+  geom_text(aes(label = comma(count)),
+            vjust = -0.4, size = 3.8, fontface = "bold", color = "#1A1A1A") +
+  scale_fill_manual(values = c("FALSE" = "#2E5F8A", "TRUE" = "#C0392B")) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(title= "Most Users Exit Before Completing Any High-Intent Action", x = NULL, y = "Users") +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor   = element_blank(),
+    panel.grid.major.y = element_line(color = "#EEEEEE"),
+    axis.ticks         = element_blank(),
+    legend.position    = "none"
+  )
+```
+
+# Not all Traffic is created equal
+
+### Conversion Rate by Traffic Channel
+
+```{r}
+#| label: fig-channels
+#| fig-width: 7
+#| fig-height: 4
+#| fig-cap: "Booking conversion rate (booking_complete users ÷ sessions) by traffic channel. Dashed line indicates site average."
+
+ga4_data |>
+  mutate(
+    channel   = fct_reorder(channel, overall_conv_rate),
+    highlight = overall_conv_rate > site_avg
+  ) |>
+  ggplot(aes(x = channel, y = overall_conv_rate, fill = highlight)) +
+  geom_col(width = 0.52) +
+  geom_text(aes(label = percent(overall_conv_rate, accuracy = 0.1)),
+            hjust = -0.15, size = 3.8, fontface = "bold", color = "#1A1A1A") +
+  geom_hline(yintercept = site_avg, linetype = "dashed",
+             color = "#888888", linewidth = 0.5) +
+  annotate("text", x = 0.6, y = site_avg + 0.003,
+           label = paste0("Site avg: ", percent(site_avg, accuracy = 0.1)),
+           size = 3.2, color = "#888888", hjust = 0) +
+  coord_flip() +
+  scale_fill_manual(values = c("FALSE" = "#7FA8C9", "TRUE" = "#1D3D5C")) +
+  scale_y_continuous(labels = percent_format(accuracy = 1),
+                     expand = expansion(mult = c(0, 0.25))) +
+  labs(x = NULL, y = NULL) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor   = element_blank(),
+    panel.grid.major.x = element_line(color = "#EEEEEE"),
+    axis.ticks         = element_blank(),
+    legend.position    = "none"
+  )
+```
+
+# Key Findings
+
+## Booking Funnel Performance by Traffic Channel
+
+```{r}
+#| label: tbl-funnel
+#| echo: false
+
+ga4_data |>
+  arrange(desc(overall_conv_rate)) |>
+  bind_rows(totals) |>
+  mutate(overall_conv_rate = percent(overall_conv_rate, accuracy = 0.1)) |>
+  select(
+    `Traffic Channel` = channel,
+    `Sessions`        = sessions,
+    `Page Views`      = page_views,
+    `Contact Us`      = contact_us_users,
+    `Form Starts`     = form_starts,
+    `Sched. Appts`    = sched_appt_users,
+    `Conv. Rate`      = overall_conv_rate
+  ) |>
+  kbl(align = c("l","c","c","c","c","c","c")) |>
+  kable_styling(
+    bootstrap_options = c("condensed", "bordered"),
+    full_width = FALSE,
+    font_size = 13
+  ) |>
+  row_spec(0, bold = TRUE, background = "#1B2A4A", color = "white") |>
+  row_spec(seq(1, nrow(ga4_data), by = 2), background = "white",   color = "#333333") |>
+  row_spec(seq(2, nrow(ga4_data), by = 2), background = "#EAF3FA", color = "#333333") |>
+  row_spec(nrow(ga4_data) + 1, bold = TRUE, background = "#D6E8F5", color = "#1B2A4A") |>
+  footnote(
+    general = "Booking Funnel Performance by Traffic Channel (Jan 1–Apr 21, 2026). Channels sorted by descending conversion rate. Conv. Rate = booking_complete users ÷ sessions.",
+    general_title = "",
+    footnote_as_chunk = TRUE
+  )
+```
+
+## Subgroup Validation: Drop-off by Channel
+
+```{r}
+#| label: tbl-dropoff
+#| echo: false
+
+ga4_data |>
+  mutate(dropoff = 1 - form_start_rate) |>
+  arrange(dropoff) |>
+  select(
+    `Traffic Channel` = channel,
+    `Page Views`      = page_views,
+    `Form Starts`     = form_starts,
+    `Form Start Rate` = form_start_rate,
+    `Drop-off Rate`   = dropoff
+  ) |>
+  mutate(across(c(`Form Start Rate`, `Drop-off Rate`),
+                ~percent(., accuracy = 0.1))) |>
+  kbl(align = c("l","c","c","c","c")) |>
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "bordered"),
+    full_width = FALSE,
+    font_size = 13
+  ) |>
+  row_spec(0, bold = TRUE, background = "#1A3A5C", color = "white")
+```
+
+## High-Intent Behavioral Signals
+
+> **Note:** `Schedule_Appointment` and `contact_us` are link clicks to the page hosting the booking form. They are reported here as behavioral context rather than sequential funnel stages, because `form_start` users exceed the combined click totals — indicating the form is reachable through multiple paths on the site.
+
+```{r}
+#| label: tbl-signals
+#| echo: false
+
+ga4_data |>
+  arrange(desc(sessions)) |>
+  bind_rows(totals) |>
+  select(
+    `Traffic Channel`    = channel,
+    `Sessions`           = sessions,
+    `Sched. Appt Clicks` = sched_appt_users,
+    `Contact Us Clicks`  = contact_us_users,
+    `Form Starts`        = form_starts,
+    `Bookings`           = bookings
+  ) |>
+  kbl(align = c("l","c","c","c","c","c")) |>
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "bordered"),
+    full_width = FALSE,
+    font_size = 13
+  ) |>
+  row_spec(0, bold = TRUE, background = "#1A3A5C", color = "white") |>
+  row_spec(nrow(ga4_data) + 1, bold = TRUE, background = "#D5E8F0")
+```

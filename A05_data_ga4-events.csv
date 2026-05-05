@@ -1,0 +1,66 @@
+# ----------------------------------------,,,
+# Events: Event name,,,
+# Account: mein3dllc,,,
+# Property: mein3d,,,
+# ----------------------------------------,,,
+# ,,,
+# All Users,,,
+# Start date: 20260101,,,
+# End date: 20260421,,,
+Event name,Session primary channel group (Default Channel Group),Event count,Total users
+page_view,Direct,394,167
+page_view,Organic Social,297,203
+page_view,Organic Search,235,61
+session_start,Direct,213,167
+session_start,Organic Social,207,203
+first_visit,Organic Social,200,200
+first_visit,Direct,164,163
+user_engagement,Organic Search,149,43
+user_engagement,Organic Social,128,97
+scroll,Organic Social,109,81
+session_start,Organic Search,86,62
+user_engagement,Direct,86,45
+scroll,Organic Search,78,37
+page_view,Referral,68,6
+scroll,Direct,62,36
+first_visit,Organic Search,58,58
+page_view,Unassigned,58,29
+link_click,Organic Search,41,13
+link_click,Direct,39,13
+user_engagement,Referral,37,4
+session_start,Unassigned,28,28
+first_visit,Unassigned,24,24
+scroll,Unassigned,24,13
+user_engagement,Unassigned,24,14
+link_click,Referral,22,2
+session_start,Referral,21,6
+form_start,Direct,18,18
+form_start,Organic Search,17,4
+Schedule_Appointment,Direct,16,6
+Schedule_Appointment,Organic Search,14,4
+link_click,Organic Social,14,9
+form_start,Organic Social,13,12
+contact_us,Direct,10,9
+scroll,Referral,9,3
+Schedule_Appointment,Referral,8,2
+click,Organic Social,7,6
+contact_us,Organic Search,7,4
+click,Organic Search,6,4
+link_click,Unassigned,6,4
+booking_complete,Organic Search,5,2
+contact_us,Referral,5,2
+Schedule_Appointment,Organic Social,4,3
+Schedule_Appointment,Unassigned,4,2
+first_visit,Paid Search,4,4
+first_visit,Referral,4,4
+page_view,Paid Search,4,4
+session_start,Paid Search,4,4
+click,Referral,3,1
+contact_us,Organic Social,3,2
+form_start,Unassigned,3,3
+contact_us,Unassigned,2,2
+booking_complete,Direct,1,1
+booking_complete,Organic Social,1,1
+booking_complete,Unassigned,1,1
+click,Direct,1,1
+form_start,Referral,1,1
