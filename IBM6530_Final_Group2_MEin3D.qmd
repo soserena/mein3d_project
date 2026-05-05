@@ -136,11 +136,11 @@ IRB approval was obtained on **March 3, 2026** (Week 6), after which official da
 
 ---
 
-# Analytic Objective 1 — Non-Personalized Baseline Campaign {#ao1}
+# Analytic Objective 1 — Non-Personalized Baseline Campaign {#AO1}
 
-*Section author: [Teammate name here]*
+*Section author: Jessica Garcia*
 
-> Establish a performance baseline using a generic, non-personalized email campaign to benchmark future personalized campaigns against.
+> Develop a performance baseline using a generic, non-personalized email campaign to benchmark future personalized campaigns against.
 
 ## Campaign Description
 
@@ -169,9 +169,9 @@ kable(ao1, caption = "Table 1: Non-Personalized Email Campaign Baseline Engageme
 - **96.1% deliverability** — the list is clean and technically sound
 - **27.3% open rate** — above industry averages for small e-commerce, suggesting the subject line performs reasonably
 - **10.0% click-to-open rate** — only 2 of 20 openers clicked; the body content and CTA failed to motivate action
-- **0 unsubscribes** — no negative signal, but also no meaningful conversion
+- **0 unsubscribes** — no negative signal, but also no meaningful engagement
 
-The primary failure point is the **open-to-click conversion**: a 90% drop-off between opening and clicking indicates the email content itself — not the subject line — is where engagement breaks down. This finding directly motivates AO4's CTA optimization analysis.
+The primary failure point is the **open-to-click conversion**: a 90% drop-off between opening and clicking indicates the email content itself — not the subject line is where engagement breaks down. This finding directly motivates AO4's CTA optimization analysis.
 
 ---
 
@@ -355,10 +355,10 @@ All code, data pipelines, and report source files are version-controlled and ava
 | Member | Contributions |
 |---|---|
 | Nerina Campos | *[Add tasks, commits, sections]* |
-| Jessica Garcia | *[Add tasks, commits, sections]* |
+| Jessica Garcia | *[Added AO1 Information]* |
 | Kathleen Juarez | *[Add tasks, commits, sections]* |
 | Krystal Lee | *[Add tasks, commits, sections]* |
-| Serena Shi | Project lead; AO structure, repo setup, narrative framework |
+| Serena Shi | *[Project lead; AO structure, repo setup, narrative framework]* |
 
 ## Session Info
 
