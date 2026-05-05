@@ -1,0 +1,367 @@
+---
+title: "Final Client Package"
+subtitle: "AI-Powered Email Personalization Strategies for MEin3D"
+author:
+  - name: "Group 2"
+  - name: "Nerina Campos"
+  - name: "Jessica Garcia"
+  - name: "Kathleen Juarez"
+  - name: "Krystal Lee"
+  - name: "Serena Shi (Project Lead)"
+date: today
+date-format: "MMMM D, YYYY"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-title: "Table of Contents"
+    number-sections: true
+    theme: cosmo
+    code-fold: true
+    code-summary: "Show Code"
+    df-print: paged
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| label: setup
+#| include: false
+
+# Load required packages
+# install.packages(c("tidyverse", "knitr", "kableExtra", "ggplot2", "scales"))
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(scales)
+```
+
+---
+
+# Executive Summary
+
+> **Bottom line up front:** MEin3D's AI-powered email personalization strategy delivers measurable gains in open rates, click-through rates, and click-to-open rates — without eroding customer trust. However, email engagement alone is not sufficient to drive conversions. Fixing mid-funnel website friction and scaling organic search investment are equally critical levers for growth.
+
+This report presents findings from a one year applied analytics project conducted on behalf of **MEin3D**, a small startup specializing in custom 3D-printed figurines. The project examined whether AI-generated, behavior-driven email personalization could improve customer engagement, trust, and ultimately booking conversions — relative to generic, one-size-fits-all email campaigns.
+
+Five analytic objectives (AOs) were pursued:
+
+| # | Analytic Objective | Method |
+|---|---|---|
+| AO1 | Establish a non-personalized email baseline | Funnel analysis |
+| AO2 | Test whether AI personalization affects user trust | One-way ANOVA |
+| AO3 | Test whether social-behavior-based personalization increases engagement | A/B testing |
+| AO4 | Isolate which email feature (CTA) drives conversion lift | Z-test, two-stage evaluation |
+| AO5 | Identify website funnel drop-off points by traffic channel | GA4 descriptive funnel analysis |
+
+---
+
+# Business Background & Problem Statement
+
+## About MEin3D
+
+MEin3D is a small, emerging startup with a distinctive product offering: high-quality, customized **3D-printed figurines** designed to capture life's most meaningful milestones — weddings, graduations, family portraits, cosplay, and more. The company's mission is to *celebrate individuality* by transforming photographs and memories into tangible, one-of-a-kind keepsakes.
+
+MEin3D operates primarily through its website ([mein3d.com](https://www.mein3d.com)) and maintains an active presence on Instagram and Facebook, where customer-shared figurines have organically generated community engagement. The business relies on a photo booth scanning experience and an online booking form as its primary customer acquisition path.
+
+## The Core Business Problem
+
+Despite a compelling product and growing social presence, MEin3D faced a significant operational gap: **the absence of automated, personalized, and data-driven customer communication.**
+
+Specifically, the business lacked:
+
+- **Email automation** — campaigns were generic, manually crafted, and sent without audience segmentation
+- **Behavioral targeting** — no system existed to tailor messaging based on past customer actions, website behavior, or social media engagement
+- **Funnel visibility** — without proper tracking infrastructure, it was unclear where prospective customers were dropping off between first visit and booking completion
+
+This communication gap had downstream consequences for three critical business outcomes:
+
+1. **Trust** — Generic emails signal low effort and may feel impersonal to a brand whose entire value proposition is individuality
+2. **Engagement** — Without relevance, email recipients have little reason to open, click, or act
+3. **Long-term customer value** — Without nurturing workflows, MEin3D could not re-engage past customers or guide new prospects through the booking funnel
+
+## Why This Matters
+
+For a small startup operating with limited marketing resources, every customer interaction carries disproportionate weight. An email that fails to convert is not just a missed click — it is a missed booking, a missed keepsake, and a missed relationship. The stakes of *getting communication right* are especially high when:
+
+- The customer base is niche and relationship-driven
+- The product requires **trust** (customers share personal photos and life moments)
+- The business is still building brand recognition and list size
+
+This project was designed to answer a practical, high-impact question:
+
+> *Can AI-powered email personalization help MEin3D move more customers from awareness to booking — without compromising the trust that its brand depends on?*
+
+---
+
+# Data & Methodology Overview
+
+## Data Sources
+
+Data for this project was collected across multiple channels over a 15-week period (approximately February–April 2026):
+
+```{r data-sources-table}
+#| label: data-sources
+#| echo: false
+
+data_sources <- tibble(
+  Source = c(
+    "Squarespace Email Campaigns",
+    "Amazon Mechanical Turk (MTurk)",
+    "Meta Business Suite",
+    "Google Analytics 4 (GA4)"
+  ),
+  `What It Captured` = c(
+    "Sent, delivered, opened, clicked, unsubscribed counts per campaign",
+    "Survey responses measuring trust (10-item Likert scale) across email conditions",
+    "Post-level engagement signals (likes, shares, comments, saves) used to classify subscriber behavior",
+    "Website sessions, page views, form starts, booking completions by traffic channel"
+  ),
+  `Used In` = c("AO1, AO3, AO4", "AO2", "AO3", "AO5")
+)
+
+kable(data_sources, caption = "Summary of Data Sources by Analytic Objective") |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = TRUE)
+```
+
+## IRB Approval & Timeline
+
+IRB approval was obtained on **March 3, 2026** (Week 6), after which official data collection commenced. Five rounds of email campaign data were collected across Weeks 6–12. MTurk survey data was collected in parallel, with analysis and interpretation completed in Weeks 13–14.
+
+> **Note to teammates:** Add any additional methodological details specific to your AO here. Include sample sizes, data cleaning steps, and any exclusion criteria applied.
+
+---
+
+# Analytic Objective 1 — Non-Personalized Baseline Campaign {#ao1}
+
+*Section author: [Teammate name here]*
+
+> Establish a performance baseline using a generic, non-personalized email campaign to benchmark future personalized campaigns against.
+
+## Campaign Description
+
+The baseline email carried the subject line *"Explore your 3D Memories with MEin3D"* and was sent from the MEin3D Team to all subscribers on March 10. The body copy offered a broad description of MEin3D's products and a generic call-to-action linking to the homepage. No audience segmentation, behavioral targeting, or personalized language was used.
+
+## Funnel Metrics
+
+```{r ao1-funnel}
+#| label: ao1-funnel-table
+#| echo: false
+
+ao1 <- tibble(
+  `Funnel Stage`         = c("Sent", "Delivered", "Opened", "Clicked", "Unsubscribed"),
+  `Volume (n)`           = c(77, 74, 20, 2, 0),
+  `Rate (%)`             = c(NA, 96.1, 27.3, 10.0, 0.0),
+  `Attrition from Prior` = c(NA, "-3.90%", "-72.97%", "-90.00%", "—")
+)
+
+kable(ao1, caption = "Table 1: Non-Personalized Email Campaign Baseline Engagement Funnel — MEin3D") |>
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) |>
+  column_spec(1, bold = TRUE)
+```
+
+## Key Takeaways
+
+- **96.1% deliverability** — the list is clean and technically sound
+- **27.3% open rate** — above industry averages for small e-commerce, suggesting the subject line performs reasonably
+- **10.0% click-to-open rate** — only 2 of 20 openers clicked; the body content and CTA failed to motivate action
+- **0 unsubscribes** — no negative signal, but also no meaningful conversion
+
+The primary failure point is the **open-to-click conversion**: a 90% drop-off between opening and clicking indicates the email content itself — not the subject line — is where engagement breaks down. This finding directly motivates AO4's CTA optimization analysis.
+
+---
+
+# Analytic Objective 2 — AI Personalization & User Trust {#ao2}
+
+*Section author: [Teammate name here]*
+
+> Does exposure to AI-personalized emails change how much users trust the MEin3D brand, compared to generic emails?
+
+## Methodology
+
+Trust was measured using a validated **10-item Likert scale** (1 = Strongly Disagree, 5 = Strongly Agree), covering dimensions including perceived brand trust, email genuineness, data comfort, transparency, and click likelihood. Participants were recruited via Amazon Mechanical Turk and randomly assigned to view either an AI-personalized or a generic (control) email before completing the trust survey.
+
+A **one-way ANOVA** was selected as the appropriate test given a continuous dependent variable (composite trust score) and a categorical independent variable (email condition: AI vs. control).
+
+## Results
+
+```{r ao2-results}
+#| label: ao2-results-table
+#| echo: false
+
+ao2 <- tibble(
+  Statistic       = c("Mean Trust (AI)", "Mean Trust (Control)", "Mean Difference",
+                       "F-Statistic", "p-Value", "95% CI (Tukey)", "Tukey p-Value", "Interpretation"),
+  Value           = c("4.24", "4.16", "0.08", "0.745", "0.39",
+                       "[−0.280, 0.110]", "0.39", "No statistically significant difference")
+)
+
+kable(ao2, caption = "Table 2: ANOVA Results — Trust Score by Email Condition") |>
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+## Interpretation
+
+The ANOVA returned F(1, 128) = 0.745, p = 0.39 — well above the α = 0.05 threshold. The Tukey post-hoc test confirmed this null result, with a 95% confidence interval that crosses zero. **There is no statistically significant difference in trust between the AI-personalized and control email conditions.**
+
+Critically, this is a *favorable* null result for MEin3D. It means:
+
+- AI personalization does **not** erode customer trust
+- The brand can scale personalized, automated campaigns without risking the relationship-driven reputation the product depends on
+- Trust stability removes a major adoption barrier for implementing AI-driven email workflows
+
+---
+
+# Analytic Objective 3 — Social-Behavior-Based Personalization & Engagement {#ao3}
+
+*Section author: [Teammate name here]*
+
+> Does personalization informed by customers' social media behavior produce higher email engagement than generic campaigns?
+
+*(Add your AO3 analysis, visualizations, and interpretation here.)*
+
+---
+
+# Analytic Objective 4 — Feature-Level CTA Optimization {#ao4}
+
+*Section author: [Teammate name here]*
+
+> Which specific AI-generated email feature — specifically CTA structure — produces measurable behavioral lift across the email engagement funnel?
+
+## Feature-Level Results Summary
+
+Across five campaign rounds (n = 363 generic, n = 365 personalized delivered):
+
+```{r ao4-metrics}
+#| label: ao4-metrics-table
+#| echo: false
+
+ao4 <- tibble(
+  Metric          = c("Open Rate", "Click-Through Rate (CTR)", "Click-to-Open Rate (CTOR)"),
+  Generic         = c("23.1%", "1.38%", "5.6%"),
+  Personalized    = c("29.9%", "3.56%", "11.4%"),
+  Lift            = c("+6.7 pp", "+2.18 pp (+2.6×)", "+5.8 pp (+2×)")
+)
+
+kable(ao4, caption = "Table 3: Feature-Level Engagement Metrics — Generic vs. Personalized CTA") |>
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+The **CTOR is the hero metric**: doubling from 5.6% to 11.4% indicates that once a recipient opens, a personalized CTA is dramatically more effective at driving action — the highest-leverage conversion point in the funnel.
+
+## Statistical Validation
+
+A two-proportion Z-test on CTR returned Z = −1.90 (p = 0.058). While this falls just short of the conventional α = 0.05 threshold, it constitutes **strong directional evidence** of a real effect. An expanded sample (n ≈ 600+ per group) would be sufficient to confirm full statistical significance.
+
+*(Add Z-test code and funnel drop-off visualization here.)*
+
+---
+
+# Analytic Objective 5 — Website Funnel & Traffic Channel Analysis {#ao5}
+
+*Section author: [Teammate name here]*
+
+> Using GA4 data, where do users drop off in the MEin3D booking funnel, and which traffic channels produce the highest-quality conversions?
+
+## Key Finding: The Conversion Problem Is On-Site, Not Off-Site
+
+563 sessions resulted in only 5 completed bookings — a **0.9% overall conversion rate**, meaning 99.1% of visitors left without booking. The sharpest funnel drop-off occurs at **Form Start**: of 470 page view users, only 38 began the booking form.
+
+## Traffic Channel Performance
+
+```{r ao5-channel}
+#| label: ao5-channel-table
+#| echo: false
+
+ao5 <- tibble(
+  `Traffic Channel` = c("Unassigned", "Organic Search", "Organic Social",
+                          "Direct", "Referral", "Paid Search", "TOTAL"),
+  Sessions          = c(32, 86, 207, 213, 21, 4, 563),
+  `Page Views`      = c(29, 61, 203, 167, 6, 4, 470),
+  `Form Starts`     = c(3, 4, 12, 18, 1, 0, 38),
+  Bookings          = c(1, 2, 1, 1, 0, 0, 5),
+  `Conv. Rate`      = c("3.1%", "2.3%", "0.5%", "0.5%", "0.0%", "0.0%", "0.9%")
+)
+
+kable(ao5, caption = "Table 4: Booking Funnel Performance by Traffic Channel (Jan 1 – Apr 21, 2026)") |>
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = TRUE) |>
+  row_spec(nrow(ao5), bold = TRUE, background = "#f0f0f0")
+```
+
+**Organic Search** (2.3% conversion) outperforms Organic Social (0.5%) and Direct (0.5%) by more than 4×, despite driving only 15.3% of total sessions — underscoring that channel quality matters far more than volume.
+
+*(Add GA4 funnel visualization and channel comparison chart here.)*
+
+---
+
+# Strategic Recommendations
+
+Based on findings across all five analytic objectives, we recommend MEin3D pursue the following actions in priority order:
+
+## Immediate Actions (0–30 days)
+
+1. **Deploy AI-personalized CTAs in all outgoing emails.** AO4 demonstrates a 2.6× CTR lift and 2× CTOR lift with near-significant evidence (p = 0.058). The risk is low — AO2 confirms trust is preserved — and the upside is substantial.
+
+2. **Fix the mid-funnel booking experience.** 99.1% of website visitors leave without booking. Redesign the page-to-contact journey with clearer value propositions, reduced form friction, and stronger inline CTAs.
+
+## Medium-Term Actions (30–90 days)
+
+3. **Invest in Organic Search / SEO.** This channel converts at 2.3% — more than double the site average. Content investment here will yield compounding returns.
+
+4. **Audit UTM tagging and GA4 channel groupings.** 32 "Unassigned" sessions convert at 3.1% (the highest tracked rate). Identifying this source could unlock a high-efficiency channel currently invisible in reporting.
+
+5. **Scale the subscriber list and run continued A/B experiments** against the AO1 baseline, using the personalized CTA format validated in AO4.
+
+## Longer-Term Actions (90+ days)
+
+6. **Implement GA4 purchase event tracking** via Google Tag Manager to measure true revenue conversion — not just form submissions — enabling accurate ROI attribution.
+
+7. **Build automated email nurture sequences** triggered by website behavior and social signals, replacing manual one-off campaigns with a scalable personalization workflow.
+
+---
+
+# Limitations
+
+- **Small sample sizes** constrain statistical power across all AOs. The AO4 Z-test result (p = 0.058) is directionally meaningful but not yet conclusive; n ≈ 600+ per group is needed for formal significance.
+- **MTurk participants** (AO2) may not perfectly represent MEin3D's actual customer base, which skews toward personal milestone buyers. External validity should be interpreted cautiously.
+- **Campaign confounds**: Email send timing, subject line variation, and audience overlap across rounds were not fully controlled, which may introduce noise into cross-campaign comparisons.
+- **GA4 data window**: Funnel analysis covers January 1 – April 21, 2026. Seasonal patterns (e.g., Valentine's Day, graduation season) may affect conversion rates and are not isolated in this analysis.
+- **Unassigned traffic**: A meaningful share of high-converting sessions remain unattributed in GA4, limiting channel-level conclusions.
+
+---
+
+# Appendix
+
+## GitHub Repository
+
+All code, data pipelines, and report source files are version-controlled and available at:
+
+> [https://github.com/soserena/mein3d_project](https://github.com/soserena/mein3d_project)
+
+## Dashboard Link
+
+> *[Insert Looker Studio or Quarto dashboard URL here]*
+
+## Presentation Link
+
+> *[Insert published Revealjs presentation URL here]*
+
+## Team Contribution Log
+
+| Member | Contributions |
+|---|---|
+| Nerina Campos | *[Add tasks, commits, sections]* |
+| Jessica Garcia | *[Add tasks, commits, sections]* |
+| Kathleen Juarez | *[Add tasks, commits, sections]* |
+| Krystal Lee | *[Add tasks, commits, sections]* |
+| Serena Shi | Project lead; AO structure, repo setup, narrative framework |
+
+## Session Info
+
+```{r session-info}
+sessionInfo()
+```
