@@ -598,11 +598,7 @@ All code, data pipelines, and report source files are version-controlled and ava
 |---|---|
 | Nerina Campos | *[Add tasks, commits, sections]* |
 | Jessica Garcia | *[Added AO1 Information]* |
-<<<<<<< HEAD
 | Kathleen Juarez | AO5, GA4 event analysis|
-=======
-| Kathleen Juarez | *[Added AO2 Information]* |
->>>>>>> 968b6b0f5bdff4d328b808c40b1df0cd778ef751
 | Krystal Lee | *[Add tasks, commits, sections]* |
 | Serena Shi | *[Project lead; AO structure, repo setup, narrative framework]* |
 
