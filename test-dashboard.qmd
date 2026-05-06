@@ -1,6 +1,6 @@
 ---
-title: "MEin3D | Google Analytics 4 Dashboard"
-subtitle: "Jan 1 – Apr 21, 2026"
+title: "MEin3D"
+subtitle: "Deliverable 1 — Final Dashboard"
 format: 
   dashboard:
     orientation: columns
@@ -15,45 +15,94 @@ library(tidyverse)
 library(scales)
 library(ggplot2)
 library(dplyr)
-library(readr)
+library(DBI)
+library(bigrquery)
 ```
 
 ```{r}
-#| label: load-data-a05
+#| label: bq-connect
 #| include: false
 
-sessions_raw <- read_csv("A05_data_sessions.csv", skip = 9, show_col_types = FALSE) |>
-  rename(channel = 1, sessions = 2, total_users = 3) |>
-  filter(!is.na(channel), channel != "")
+project_id <- "mein3d-487204"
 
-events_raw <- read_csv("A05_data_ga4-events.csv", skip = 9, show_col_types = FALSE) |>
-  rename(event_name = 1, channel = 2, event_count = 3, total_users = 4) |>
-  filter(!is.na(event_name), event_name != "")
+bigrquery::bq_auth()
+
+con <- dbConnect(
+  bigrquery::bigquery(),
+  project = project_id,
+  billing = project_id
+)
+
+con  # verify connection
+```
+
+```{r}
+#| label: bq-query
+#| include: false
+
+sql <- "
+  WITH base AS (
+    SELECT
+      event_name,
+      user_pseudo_id,
+      CASE
+        WHEN traffic_source.medium = 'organic'               THEN 'Organic Search'
+        WHEN traffic_source.medium = 'referral'              THEN 'Referral'
+        WHEN traffic_source.medium = 'cpc'                   THEN 'Paid Search'
+        WHEN LOWER(traffic_source.source) LIKE '%instagram%'
+          OR LOWER(traffic_source.source) LIKE '%facebook%'
+          OR LOWER(traffic_source.source) LIKE '%tiktok%'    THEN 'Organic Social'
+        WHEN traffic_source.medium IS NULL
+          OR traffic_source.medium = '(none)'                THEN 'Direct'
+        ELSE 'Unassigned'
+      END AS channel
+    FROM `mein3d-487204.analytics_513869218.events_*`
+    WHERE _TABLE_SUFFIX BETWEEN '20260101' AND '20260421'
+  ),
+  sessions AS (
+    SELECT
+      channel,
+      COUNT(DISTINCT user_pseudo_id) AS sessions
+    FROM base
+    WHERE event_name = 'session_start'
+    GROUP BY channel
+  ),
+  event_users AS (
+    SELECT
+      channel,
+      event_name,
+      COUNT(DISTINCT user_pseudo_id) AS total_users
+    FROM base
+    WHERE event_name IN (
+      'page_view',
+      'form_start',
+      'booking_complete',
+      'Schedule_Appointment',
+      'contact_us'
+    )
+    GROUP BY channel, event_name
+  )
+SELECT
+  s.channel,
+  s.sessions,
+  MAX(CASE WHEN e.event_name = 'page_view'            THEN e.total_users ELSE 0 END) AS page_views,
+  MAX(CASE WHEN e.event_name = 'form_start'           THEN e.total_users ELSE 0 END) AS form_starts,
+  MAX(CASE WHEN e.event_name = 'booking_complete'     THEN e.total_users ELSE 0 END) AS bookings,
+  MAX(CASE WHEN e.event_name = 'Schedule_Appointment' THEN e.total_users ELSE 0 END) AS sched_appt_users,
+  MAX(CASE WHEN e.event_name = 'contact_us'           THEN e.total_users ELSE 0 END) AS contact_us_users
+FROM sessions s
+LEFT JOIN event_users e ON s.channel = e.channel
+GROUP BY s.channel, s.sessions
+ORDER BY s.sessions DESC
+"
+ga4_data <- dbGetQuery(con, sql)
 ```
 
 ```{r}
 #| label: prepare-data-a05
 #| include: false
 
-extract_event <- function(event_nm, col_name) {
-  events_raw |>
-    filter(event_name == event_nm) |>
-    select(channel, {{ col_name }} := total_users)
-}
-
-page_view        <- extract_event("page_view",            page_views)
-form_start       <- extract_event("form_start",           form_starts)
-booking_complete <- extract_event("booking_complete",     bookings)
-schedule_appt    <- extract_event("Schedule_Appointment", sched_appt_users)
-contact_us       <- extract_event("contact_us",           contact_us_users)
-
-ga4_data <- sessions_raw |>
-  select(channel, sessions) |>
-  left_join(page_view,        by = "channel") |>
-  left_join(form_start,       by = "channel") |>
-  left_join(booking_complete, by = "channel") |>
-  left_join(schedule_appt,    by = "channel") |>
-  left_join(contact_us,       by = "channel") |>
+ga4_data <- ga4_data |>
   mutate(across(-channel, ~replace_na(., 0))) |>
   mutate(
     page_view_rate    = if_else(sessions > 0,    page_views  / sessions,   0),
@@ -75,6 +124,8 @@ totals <- ga4_data |>
   )
 
 site_avg <- totals$overall_conv_rate
+
+dbDisconnect(con)
 ```
 
 # AO1 – AO3 {orientation="columns"}
@@ -116,7 +167,6 @@ Add your visualization or analysis here.
 
 Add your visualization or analysis here.
 :::
-
 
 ::: {.card title="Booking Conversion Rate by Traffic Channel"}
 ```{r}
@@ -166,6 +216,10 @@ ga4_data |>
 ::: {.card title="Booking Funnel: Most Users Exit Before the Form"}
 ```{r}
 #| label: fig-funnel
+#| fig-width: 10
+#| fig-height: 6
+#| out-width: "100%"
+#| out-height: "100%"
 
 funnel_long <- tibble(
   stage = factor(
