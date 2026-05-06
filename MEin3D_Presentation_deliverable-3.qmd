@@ -1,0 +1,295 @@
+---
+title: "From Clicks to Conversions"
+subtitle: "AI Powered Email Personalization Strategies for MEin3D"
+author: "Nerina Campos · Jessica Garcia · Kathleen Juarez · Krystal Lee · Serena Shi (Project Lead) | Faculty Lead: Dr. Elif Ozkaya"
+format:
+  revealjs:
+    theme: default
+    transition: slide
+    slide-number: true
+    footer: "MEin3D | IBM 6530 | Group 2"
+    width: 1280
+    height: 720
+    css: mein3d-slides.css
+    auto-scale: true
+    smaller: true
+    scrollable: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(tidyr)
+```
+
+---
+
+## Business Problem & Project Overview
+
+:::: {.columns}
+::: {.column width="48%"}
+::: red-box
+**MEin3D** — small startup specializing in custom 3D-printed figurines for life's milestones.
+
+MEin3D lacked **automated, personalized, data-driven communication** — limiting trust, engagement, and long-term customer value.
+:::
+:::
+::: {.column width="52%"}
+
+| AO | Question | Method |
+|---|---|---|
+| AO1 | Non-personalized baseline? | Funnel analysis |
+| AO2 | Does AI affect trust? | One-way ANOVA |
+| AO3 | Social behavior → engagement? | A/B test |
+| AO4 | Which CTA drives lift? | Z-test |
+| AO5 | Where do users drop off? | GA4 funnel |
+
+:::
+::::
+
+---
+
+## AO1 — Non-Personalized Baseline
+*Jessica Garcia*
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r ao1-chart, fig.height=4}
+tibble(
+  stage = factor(c("Sent","Delivered","Opened","Clicked"),
+                 levels=c("Sent","Delivered","Opened","Clicked")),
+  n = c(77, 74, 20, 2)
+) |>
+ggplot(aes(x=stage, y=n)) +
+  geom_bar(stat="identity", fill="#666", width=0.6) +
+  geom_text(aes(label=n), vjust=-0.4, fontface="bold", size=6) +
+  scale_y_continuous(limits=c(0,90)) +
+  labs(title="Baseline Email Funnel — March 10", x=NULL, y="Recipients") +
+  theme_minimal(base_size=14)
+```
+:::
+::: {.column width="50%"}
+
+| Metric | Value |
+|---|---|
+| Deliverability | **96.1%** |
+| Open Rate | **27.3%** |
+| Click-to-Open Rate | **10.0%** |
+| Unsubscribes | **0** |
+
+::: red-box
+**Key finding:** 90% drop-off between open and click. The content and CTA are the bottleneck — not the subject line. This directly motivates AO4.
+:::
+:::
+::::
+
+---
+
+## AO2 — AI Personalization & Trust
+*Krystal Lee*
+
+:::: {.columns}
+::: {.column width="52%"}
+```{r ao2-chart, fig.height=4.2}
+tibble(condition=c("AI","Control"), mean_trust=c(4.24,4.16)) |>
+ggplot(aes(x=condition, y=mean_trust, fill=condition)) +
+  geom_bar(stat="identity", width=0.5) +
+  geom_text(aes(label=mean_trust), vjust=-0.5, fontface="bold", size=7) +
+  scale_fill_manual(values=c("AI"="#777","Control"="#aaa")) +
+  scale_y_continuous(limits=c(0,5)) +
+  labs(title="Average Trust Score by Condition",
+       subtitle="10-item Likert scale (1–5) · n = 130",
+       x=NULL, y="Score (1–5)") +
+  theme_minimal(base_size=14) + theme(legend.position="none")
+```
+:::
+::: {.column width="48%"}
+
+| Statistic | Value |
+|---|---|
+| Mean Trust (AI) | **4.24** |
+| Mean Trust (Control) | **4.16** |
+| F-Statistic | **0.745** |
+| p-Value | **0.39** |
+| 95% CI (Tukey) | **[−0.280, 0.110]** |
+
+::: red-box
+AI personalization does **not** erode trust — **green light to scale personalized campaigns.**
+:::
+:::
+::::
+
+---
+
+## AO3 — Social Behavior & Engagement
+*Nerina Campos*
+
+**Meta signals (likes, shares, saves, comments) used to classify subscribers → personalized vs. generic**
+
+```{r ao3-table}
+tibble(
+  `Email Type`=c("Personalized","Generic"),
+  `Subject Line`=c("Your Car Could Be Next 🚗","Something New Is Coming This April 🚗"),
+  Sent=c(73,74), Opened=c(19,16), Clicked=c(4,0),
+  `Open Rate`=c("26%","22%"), `Click Rate`=c("**5%**","**0%**")
+) |>
+kable(escape=FALSE) |>
+  kable_styling(full_width=TRUE, font_size=20) |>
+  row_spec(1, background="#fdecea", bold=TRUE)
+```
+
+::: red-box
+**Personalization drives action** — 5% click rate vs. 0% for generic. Behavior-based messaging creates stronger connection and higher conversion potential.
+:::
+
+---
+
+## AO4 — CTA Feature Optimization
+*Serena Shi*
+
+```{r ao4-chart, fig.height=3.6, fig.width=11}
+tibble(
+  metric=factor(rep(c("Open Rate (%)","CTR (%)","CTOR (%)"),each=2),
+                levels=c("Open Rate (%)","CTR (%)","CTOR (%)")),
+  condition=rep(c("Generic","Personalized"),3),
+  value=c(23.1,29.9,1.38,3.56,5.6,11.4)
+) |>
+ggplot(aes(x=condition, y=value, fill=condition)) +
+  geom_bar(stat="identity", width=0.55) +
+  geom_text(aes(label=paste0(value,"%")), vjust=-0.4, fontface="bold", size=5.5) +
+  scale_fill_manual(values=c("Generic"="#888","Personalized"="#c0392b")) +
+  facet_wrap(~metric, scales="free_y") +
+  labs(title="Personalized CTA vs. Generic — 5 Campaign Rounds", x=NULL, y=NULL) +
+  theme_minimal(base_size=14) +
+  theme(legend.position="bottom", strip.text=element_text(face="bold",size=13))
+```
+
+:::: {.columns}
+::: {.column width="33%"}
+::: stat-box-dark
+Open Rate **+6.7pp**\
+23.1% → 29.9%
+:::
+:::
+::: {.column width="33%"}
+::: stat-box-dark
+CTR **+2.6×**\
+1.38% → 3.56%
+:::
+:::
+::: {.column width="33%"}
+::: hero-metric
+CTOR **+2×**\
+5.6% → 11.4%\
+Z = −1.90, p = 0.058
+:::
+:::
+::::
+
+---
+
+## AO5 — Website Funnel Analysis
+*Kathleen Juarez*
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r ao5-funnel, fig.height=4.2}
+tibble(
+  stage=factor(c("Sessions","Page Views","Form Start","Bookings"),
+               levels=c("Sessions","Page Views","Form Start","Bookings")),
+  n=c(563,470,38,5),
+  fill=c("a","a","b","c")
+) |>
+ggplot(aes(x=stage, y=n, fill=fill)) +
+  geom_bar(stat="identity", width=0.6) +
+  geom_text(aes(label=n), vjust=-0.4, fontface="bold", size=7) +
+  scale_fill_manual(values=c("a"="#1a3a5c","b"="#c0392b","c"="#27ae60")) +
+  scale_y_continuous(limits=c(0,640)) +
+  labs(title="Booking Funnel — Jan 1 to Apr 21, 2026", x=NULL, y="Users") +
+  theme_minimal(base_size=14) + theme(legend.position="none")
+```
+:::
+::: {.column width="50%"}
+
+| Channel | Sessions | Conv. Rate |
+|---|---|---|
+| Unassigned | 32 | **3.1%** |
+| Organic Search | 86 | **2.3%** |
+| Organic Social | 207 | 0.5% |
+| Direct | 213 | 0.5% |
+| **TOTAL** | **563** | **0.9%** |
+
+::: red-box
+**99.1% of visitors leave without booking.** Sharpest drop at Form Start. Organic Search converts 4× better than Social.
+:::
+:::
+::::
+
+---
+
+## Recommendations & Summary
+
+:::: {.columns}
+::: {.column width="50%"}
+**Immediate (0–30 days)**
+
+::: rec-item
+Deploy AI-personalized CTAs — 2.6× CTR, trust preserved
+:::
+::: rec-item
+Fix the booking form — 92% drop-off at Form Start
+:::
+
+**Medium-Term (30–90 days)**
+
+::: rec-item
+Invest in Organic Search — highest converting channel
+:::
+::: rec-item
+Scale A/B testing to n ≈ 600+ to confirm AO4
+:::
+
+**Long-Term (90+ days)**
+
+::: rec-item
+Build automated email nurture sequences
+:::
+::: rec-item
+Implement GA4 purchase event tracking
+:::
+:::
+::: {.column width="50%"}
+
+| AO | Key Finding |
+|---|---|
+| AO1 | 10% CTOR baseline — content is bottleneck |
+| AO2 | AI preserves trust (p = 0.39) |
+| AO3 | 5% click vs. 0% generic |
+| AO4 | **2× CTOR, 2.6× CTR** lift |
+| AO5 | 99.1% don't book — fix funnel |
+
+::: big-quote
+The trust is there. The lift is real. Fix the funnel.
+:::
+:::
+::::
+
+---
+
+## Thank You
+
+::: thank-you-box
+**Group 2 — IBM 6530**
+
+Nerina Campos · Jessica Garcia · Kathleen Juarez · Krystal Lee · **Serena Shi (Project Lead)**
+
+*Faculty Lead: Dr. Elif Ozkaya*
+
+GitHub: [github.com/soserena/mein3d_project](https://github.com/soserena/mein3d_project)
+:::
