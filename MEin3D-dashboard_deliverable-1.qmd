@@ -5,6 +5,7 @@ format:
   dashboard:
     orientation: columns
     theme: minty
+    embed-resources: true
 ---
 
 ```{r}
