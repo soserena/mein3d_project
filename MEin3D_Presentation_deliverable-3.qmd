@@ -1,6 +1,6 @@
 ---
-title: "MEin3D_Presentation_deliverable-3.qmd"
-subtitle: "Deliverable 3 - Final Presentation"
+title: "MEin3D-Presentation_deliverable-3.qmd"
+subtitle: "Deliverable 3 — Final Presentation"
 format:
   revealjs:
     theme: default
@@ -9,7 +9,6 @@ format:
     footer: "MEin3D | IBM 6530 | Group 2"
     width: 1280
     height: 720
-    css: mein3d-slides.css
 execute:
   echo: false
   warning: false
@@ -23,8 +22,6 @@ library(kableExtra)
 library(ggplot2)
 library(tidyr)
 ```
-
----
 
 ## {.center}
 
@@ -66,12 +63,8 @@ MEin3D lacked **automated, personalized, data-driven communication** — limitin
 
 ---
 
-## AO1 — Non-Personalized Baseline {.ao-header}
+## AO1 — Non-Personalized Baseline
 *Jessica Garcia*
-
----
-
-## AO1 — Results
 
 :::: {.columns}
 ::: {.column width="50%"}
@@ -106,12 +99,8 @@ ggplot(aes(x=stage, y=n)) +
 
 ---
 
-## AO2 — AI Personalization & Trust {.ao-header}
+## AO2 — AI Personalization & Trust
 *Krystal Lee*
-
----
-
-## AO2 — Results
 
 :::: {.columns}
 ::: {.column width="52%"}
@@ -146,12 +135,8 @@ AI personalization does **not** erode trust — **green light to scale personali
 
 ---
 
-## AO3 — Social Behavior & Engagement {.ao-header}
+## AO3 — Social Behavior & Engagement
 *Nerina Campos*
-
----
-
-## AO3 — Results
 
 **Meta signals (likes, shares, saves, comments) used to classify subscribers → personalized vs. generic**
 
@@ -173,12 +158,8 @@ kable(escape=FALSE) |>
 
 ---
 
-## AO4 — CTA Feature Optimization {.ao-header}
+## AO4 — CTA Feature Optimization
 *Serena Shi*
-
----
-
-## AO4 — Results
 
 ```{r ao4-chart, fig.height=3.6, fig.width=11}
 tibble(
@@ -221,12 +202,8 @@ Z = −1.90, p = 0.058
 
 ---
 
-## AO5 — Website Funnel Analysis {.ao-header}
+## AO5 — Website Funnel Analysis
 *Kathleen Juarez*
-
----
-
-## AO5 — Results
 
 :::: {.columns}
 ::: {.column width="50%"}
@@ -324,4 +301,3 @@ Nerina Campos · Jessica Garcia · Kathleen Juarez · Krystal Lee · **Serena Sh
 
 GitHub: [github.com/soserena/mein3d_project](https://github.com/soserena/mein3d_project)
 :::
-
