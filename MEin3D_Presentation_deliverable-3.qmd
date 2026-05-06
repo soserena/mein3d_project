@@ -1,6 +1,6 @@
 ---
-title: "MEin3D-Presentation_deliverable-3.qmd"
-subtitle: "Deliverable 3 — Final Presentation"
+title: "From Clicks to Conversions"
+subtitle: "AI Powered Email Personalization Strategies for MEin3D"
 author: "Nerina Campos · Jessica Garcia · Kathleen Juarez · Krystal Lee · Serena Shi (Project Lead) | Faculty Lead: Dr. Elif Ozkaya"
 format:
   revealjs:
@@ -10,6 +10,10 @@ format:
     footer: "MEin3D | IBM 6530 | Group 2"
     width: 1280
     height: 720
+    css: mein3d-slides.css
+    auto-scale: true
+    smaller: true
+    scrollable: true
 execute:
   echo: false
   warning: false
