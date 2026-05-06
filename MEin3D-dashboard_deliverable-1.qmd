@@ -195,10 +195,41 @@ ggplot(trust_items, aes(x = score, y = reorder(item, score), fill = condition)) 
 ```
 :::
 
-::: {.card title="AO3 – Placeholder"}
-**[PLACEHOLDER — AO3 Team Member]**
+::: {.card title="AO3 – Social Behavior Personalization & Engagement"}
+**[Serena — AO3 Team Member]**
+```{r}
+#| label: ao3-engagement-chart
+#| fig-width: 10
+#| fig-height: 6
+#| out-width: "100%"
+#| out-height: "100%"
 
-Add your visualization or analysis here.
+ao3_long <- tibble(
+  `Email Type` = rep(c("Personalized", "Generic"), 2),
+  Metric       = c("Open Rate", "Open Rate", "Click Rate", "Click Rate"),
+  Rate         = c(29.86, 23.14, 3.56, 1.38)
+)
+
+ggplot(ao3_long, aes(x = Metric, y = Rate, fill = `Email Type`)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.5) +
+  geom_text(aes(label = paste0(Rate, "%")),
+            position = position_dodge(width = 0.5),
+            vjust = -0.5, size = 4, fontface = "bold") +
+  scale_fill_manual(values = c("Personalized" = "#C0392B", "Generic" = "#7FA8C9")) +
+  scale_y_continuous(limits = c(0, 35)) +
+  labs(
+    title    = "Personalized Emails Achieve Higher Open and Click Rates",
+    subtitle = "Based on 5 campaign rounds · Personalized n=365, Generic n=363",
+    x        = NULL,
+    y        = "Rate (%)",
+    fill     = "Email Type"
+  ) +
+  theme_minimal(base_size = 18) +
+  theme(
+    panel.grid.major.x = element_blank(),
+    legend.position    = "bottom"
+  )
+```
 :::
 
 # AO4 – AO5 {orientation="columns"}
