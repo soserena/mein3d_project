@@ -1,6 +1,7 @@
 ---
 title: "MEin3D-Presentation_deliverable-3.qmd"
 subtitle: "Deliverable 3 — Final Presentation"
+author: "Nerina Campos · Jessica Garcia · Kathleen Juarez · Krystal Lee · Serena Shi (Project Lead) | Faculty Lead: Dr. Elif Ozkaya"
 format:
   revealjs:
     theme: default
