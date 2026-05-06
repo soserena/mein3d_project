@@ -327,7 +327,7 @@ Trust stability removes a major adoption barrier. MEin3D can confidently deploy 
 
 *Section author: Serena Shi*
 
-> Does personalization informed by customers' social media behavior produce higher email engagement than generic campaigns?
+> To determine whether behavior-informed email personalization leads to higher engagement compared to generic email messaging.
 
 ## Overview
 
@@ -435,7 +435,7 @@ This finding directly supports scaling the Meta signals → insight → email de
 
 # Analytic Objective 4 — Feature-Level CTA Optimization {#ao4}
 
-*Section author: [Teammate name here]*
+*Section author: [Nerina Campos]*
 
 > Which specific AI-generated email feature — specifically CTA structure — produces measurable behavioral lift across the email engagement funnel?
 
@@ -470,7 +470,7 @@ A two-proportion Z-test on CTR returned Z = −1.90 (p = 0.058). While this fall
 
 # Analytic Objective 5 — Website Funnel & Traffic Channel Analysis {#ao5}
 
-Section author: Kathleen Juarez
+*Section author: Kathleen Juarez*
 
 > Using GA4 data, where do users drop off in the MEin3D booking funnel, and which traffic channels produce the highest-quality conversions?
 
