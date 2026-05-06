@@ -325,11 +325,111 @@ Trust stability removes a major adoption barrier. MEin3D can confidently deploy 
 
 # Analytic Objective 3 — Social-Behavior-Based Personalization & Engagement {#ao3}
 
-*Section author: [Teammate name here]*
+*Section author: Serena Shi*
 
 > Does personalization informed by customers' social media behavior produce higher email engagement than generic campaigns?
 
-*(Add your AO3 analysis, visualizations, and interpretation here.)*
+## Overview
+
+AO3 examines whether using real customer social media behavior — specifically Meta (Instagram/Facebook) engagement signals — as an input for email personalization produces meaningfully higher engagement than sending the same generic email to all subscribers.
+
+The logic is straightforward: a customer who tagged MEin3D in a post, saved a product photo, or commented on a reel has demonstrated specific interest. Sending that customer an email that reflects what they engaged with should feel more relevant — and relevance should drive opens and clicks.
+
+## Methodology
+
+### Personalization Decision Framework
+
+Meta Business Suite data was used to classify subscribers by engagement level. The decision rule was simple:
+
+| Behavior Signal | Email Decision |
+|---|---|
+| High engagement + specific interest (e.g., tagged MEin3D, saved a post) | Personalized Email |
+| Low engagement or unclear interest | Generic Email |
+
+### A/B Experiment Design
+
+A single campaign round was used to directly compare the two conditions:
+
+- **Control (Generic):** Subject line — *"Something New Is Coming This April 🚗"* — broad, no behavioral reference
+- **Treatment (Personalized):** Subject line — *"Your Car Could Be Next 🚗"* — tailored to subscribers who had engaged with MEin3D's car figurine content on social media
+- Both emails were sent within the same send window to eliminate timing as a confound
+- Email body content was identical except for one personalized line in the treatment referencing the subscriber's past engagement
+
+### Variables
+
+- **Input (IV):** Email type — Generic vs. Personalized
+- **Output (DV):** Open rate and click rate
+
+## Results
+
+```{r ao3-results}
+#| label: ao3-results-table
+#| echo: false
+
+ao3 <- tibble(
+  `Email Type`  = c("Personalized", "Generic"),
+  `Email Title` = c("Your Car Could Be Next 🚗", "Something New Is Coming This April 🚗"),
+  Sent          = c(73, 74),
+  Delivered     = c(73, 74),
+  Opened        = c(19, 16),
+  Clicked       = c(4, 0),
+  `Open Rate`   = c("26.0%", "22.0%"),
+  `Click Rate`  = c("5.0%", "0.0%")
+)
+
+kable(ao3, caption = "Table 5: AO3 Campaign Results — Personalized vs. Generic Email") |>
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = TRUE)
+```
+
+```{r ao3-chart}
+#| label: ao3-bar-chart
+#| echo: false
+#| fig-cap: "Figure 1: Open Rate and Click Rate by Email Type — AO3 Campaign"
+
+ao3_long <- tibble(
+  `Email Type` = rep(c("Personalized", "Generic"), 2),
+  Metric       = c("Open Rate", "Open Rate", "Click Rate", "Click Rate"),
+  Rate         = c(26.0, 22.0, 5.0, 0.0)
+)
+
+ggplot(ao3_long, aes(x = Metric, y = Rate, fill = `Email Type`)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.5) +
+  scale_fill_manual(values = c("Personalized" = "#B22222", "Generic" = "#808080")) +
+  labs(
+    title = "Personalized Emails Outperform Generic Across Both Metrics",
+    x = NULL,
+    y = "Rate (%)",
+    fill = "Email Type"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+## Key Findings
+
+**Personalized emails captured more attention:**
+
+- Open rate was 26% vs. 22% for generic — a 4 percentage point lift
+- Tailoring the subject line to reflect what the subscriber had actually engaged with on social media increased the likelihood they would open the email
+
+**Personalization drove actual user action:**
+
+- Click rate was 5% for personalized vs. 0% for generic
+- Not a single generic email recipient clicked through — the content, while not offensive, gave them no reason to act
+- All 4 clicks came from the personalized group
+
+**Small content changes created meaningful impact:**
+
+- The two emails were nearly identical in body copy — the primary difference was one personalized sentence and a subject line referencing the subscriber's known interest
+- This suggests MEin3D does not need to completely rebuild emails from scratch to see engagement gains; **targeted micro-personalization is sufficient**
+
+## Interpretation
+
+The AO3 results establish that behavior-based personalization — even when applied minimally — outperforms generic messaging on both awareness (opens) and action (clicks). The 0% click rate on the generic email is especially telling: it suggests that without a signal of relevance, subscribers read but do not engage.
+
+This finding directly supports scaling the Meta signals → insight → email decision pipeline introduced in this objective. As MEin3D's social following grows, so does the pool of behavioral data available to inform smarter segmentation — making this approach more powerful over time, not less.
+
+> **Note:** This single-round comparison has limited statistical power given small sample sizes (n = 73–74 per group). Results are directionally strong but should be interpreted alongside the multi-round findings in AO4 before drawing firm conclusions.
 
 ---
 
