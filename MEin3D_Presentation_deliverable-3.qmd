@@ -24,19 +24,6 @@ library(ggplot2)
 library(tidyr)
 ```
 
-## {.center}
-
-::: title-box
-**From Clicks to Conversions:**
-AI Powered Email Personalization Strategies for **MEin3D**
-
-::: authors
-Nerina Campos · Jessica Garcia · Kathleen Juarez · Krystal Lee · **Serena Shi (Project Lead)**
-
-*Faculty Lead: Dr. Elif Ozkaya*
-:::
-:::
-
 ---
 
 ## Business Problem & Project Overview
